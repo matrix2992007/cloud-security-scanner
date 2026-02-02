@@ -1,0 +1,131 @@
+/* Matrix Security UI Framework v4.0.8 */
+:root {
+    --primary-green: #39ff14;
+    --dark-bg: #0d1117;
+    --panel-bg: #161b22;
+    --border-color: #30363d;
+    --text-gray: #8b949e;
+}
+
+body {
+    background-color: var(--dark-bg);
+    color: #c9d1d9;
+    font-family: 'Segoe UI', 'Courier New', monospace;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    background-image: radial-gradient(circle at center, #1a232e 0%, #0d1117 100%);
+}
+
+.main-container {
+    background: var(--panel-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 40px;
+    width: 450px;
+    text-align: center;
+    box-shadow: 0 0 40px rgba(0, 0, 0, 0.7), 0 0 2px var(--primary-green);
+    position: relative;
+    overflow: hidden;
+}
+
+/* تأثير التوهج العلوي */
+.main-container::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--primary-green), transparent);
+}
+
+.header h1 {
+    color: #58a6ff;
+    font-size: 24px;
+    letter-spacing: 1px;
+    margin-bottom: 5px;
+    text-transform: uppercase;
+}
+
+.subtitle {
+    color: var(--text-gray);
+    font-size: 12px;
+    margin-bottom: 30px;
+    letter-spacing: 2px;
+}
+
+.input-wrapper input {
+    width: 100%;
+    padding: 15px;
+    border-radius: 6px;
+    border: 1px solid var(--border-color);
+    background: #010409;
+    color: var(--primary-green);
+    font-family: monospace;
+    margin-bottom: 20px;
+    box-sizing: border-box;
+    outline: none;
+    transition: border 0.3s;
+}
+
+.input-wrapper input:focus {
+    border-color: var(--primary-green);
+}
+
+button {
+    background-color: #238636;
+    color: white;
+    border: 1px solid rgba(255,255,255,0.1);
+    padding: 15px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+    width: 100%;
+    font-size: 14px;
+    letter-spacing: 1px;
+    transition: all 0.3s ease;
+}
+
+button:hover {
+    background-color: #2ea043;
+    box-shadow: 0 0 20px rgba(46, 160, 67, 0.5);
+    transform: translateY(-1px);
+}
+
+.terminal {
+    background: #000;
+    border: 1px solid #333;
+    border-radius: 4px;
+    padding: 15px;
+    margin-top: 25px;
+    height: 100px;
+    overflow-y: auto;
+    text-align: left;
+    font-size: 11px;
+}
+
+.line {
+    color: var(--primary-green);
+    margin-bottom: 4px;
+    border-right: 2px solid var(--primary-green);
+    width: fit-content;
+    white-space: nowrap;
+    overflow: hidden;
+    animation: typing 2s steps(30, end);
+}
+
+@keyframes typing {
+    from { width: 0 }
+    to { width: 100% }
+}
+
+.footer {
+    margin-top: 25px;
+    font-size: 10px;
+    color: var(--text-gray);
+    display: flex;
+    justify-content: space-between;
+}
+
+.val { color: var(--primary-green); font-weight: bold; }
